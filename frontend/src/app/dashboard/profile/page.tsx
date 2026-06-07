@@ -2,14 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Shield, Image as ImageIcon } from 'lucide-react';
+import { User, Shield, Image as ImageIcon, Languages } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
+import { LanguageToggle } from '@/components/ui/LanguageToggle';
+import { useLanguage } from '@/context/LanguageContext';
 import apiClient from '@/lib/api.client';
 import styles from './profile.module.css';
 import { CURRENCIES } from '@/lib/currency';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { t } = useLanguage();
   // Correction de la coquille: setProfiale -> setProfile
   const [profile, setProfile] = useState<any>(null);
 
@@ -180,20 +183,29 @@ export default function ProfilePage() {
     }
   };
 
-  if (!profile) return <div className={styles.container}>Loading profile...</div>;
+  if (!profile) return <div className={styles.container}>{t('profile.loading')}</div>;
 
   return (
     <div className={styles.container}>
       <div>
-        <h1 className={styles.title}>Profile Settings</h1>
-        <p className={styles.subtitle}>Manage your account details and security preferences.</p>
+        <h1 className={styles.title}>{t('profile.title')}</h1>
+        <p className={styles.subtitle}>{t('profile.subtitle')}</p>
       </div>
+
+      <Card glass>
+        <div className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            <Languages size={20} /> {t('common.language')}
+          </h2>
+          <LanguageToggle />
+        </div>
+      </Card>
 
       {/* Personal Info Section */}
       <Card glass>
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>
-            <User size={20} /> Personal Information
+            <User size={20} /> {t('profile.personal')}
           </h2>
           {infoStatus && (
             <div className={infoStatus.type === 'success' ? styles.successMessage : styles.errorMessage}>
@@ -202,7 +214,7 @@ export default function ProfilePage() {
           )}
           <form onSubmit={handleUpdateInfo} className={styles.section}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Surnom (Username)</label>
+              <label className={styles.label}>{t('profile.nickname')}</label>
               <input
                 type="text"
                 value={username}
@@ -212,7 +224,7 @@ export default function ProfilePage() {
               />
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Adresse Email</label>
+              <label className={styles.label}>{t('common.email')}</label>
               <input
                 type="email"
                 value={email}
@@ -222,7 +234,7 @@ export default function ProfilePage() {
               />
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Preferred Currency</label>
+              <label className={styles.label}>{t('profile.currency')}</label>
               <select
                 value={preferredCurrency}
                 onChange={(e) => setPreferredCurrency(e.target.value)}
@@ -236,7 +248,7 @@ export default function ProfilePage() {
               </select>
             </div>
             <button type="submit" className={styles.button} disabled={isLoading}>
-              {isLoading ? 'Sauvegarde...' : 'Sauvegarder les infos'}
+              {isLoading ? t('profile.saving') : t('profile.save')}
             </button>
           </form>
         </div>
@@ -261,18 +273,18 @@ export default function ProfilePage() {
                 <div className={styles.avatarFallback}>{username ? username[0].toUpperCase() : 'U'}</div>
               )}
               <div className={styles.formGroup} style={{ flex: 1 }}>
-                <label className={styles.label}>Upload depuis le PC</label>
+                <label className={styles.label}>{t('profile.avatarUpload')}</label>
                 <input
                   type="file"
                   accept="image/png, image/jpeg, image/webp"
                   onChange={handleFileChange}
                   className={styles.input}
                 />
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Formats supportés: JPEG, PNG, WEBP.</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('profile.supportedFormats')}</p>
               </div>
             </div>
             <button type="submit" className={styles.button} disabled={isLoading || !avatarFile}>
-              {isLoading ? 'Upload en cours...' : 'Mettre à jour l\'avatar'}
+              {isLoading ? t('profile.uploading') : t('profile.updateAvatar')}
             </button>
           </form>
         </div>
@@ -282,7 +294,7 @@ export default function ProfilePage() {
       <Card glass>
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>
-            <Shield size={20} /> Security
+            <Shield size={20} /> {t('profile.security')}
           </h2>
           {pwdStatus && (
             <div className={pwdStatus.type === 'success' ? styles.successMessage : styles.errorMessage}>
@@ -291,7 +303,7 @@ export default function ProfilePage() {
           )}
           <form onSubmit={handleChangePassword} className={styles.section}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Current Password</label>
+              <label className={styles.label}>{t('profile.currentPassword')}</label>
               <input
                 type="password"
                 value={oldPassword}
@@ -303,17 +315,17 @@ export default function ProfilePage() {
                 required
               />
               {isCheckingPassword && (
-                <p className={styles.inputFeedbackChecking}>Vérification du mot de passe...</p>
+                <p className={styles.inputFeedbackChecking}>{t('profile.checkingPassword')}</p>
               )}
               {isOldPasswordCorrect === false && !isCheckingPassword && (
-                <p className={styles.inputFeedbackError}>Mot de passe actuel incorrect.</p>
+                <p className={styles.inputFeedbackError}>{t('profile.passwordIncorrect')}</p>
               )}
               {isOldPasswordCorrect === true && !isCheckingPassword && (
-                <p className={styles.inputFeedbackSuccess}>Mot de passe correct.</p>
+                <p className={styles.inputFeedbackSuccess}>{t('profile.passwordCorrect')}</p>
               )}
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>New Password</label>
+              <label className={styles.label}>{t('profile.newPassword')}</label>
               <input
                 type="password"
                 value={newPassword}
@@ -324,7 +336,7 @@ export default function ProfilePage() {
               />
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Confirm New Password</label>
+              <label className={styles.label}>{t('profile.confirmPassword')}</label>
               <input
                 type="password"
                 value={confirmPassword}
@@ -337,14 +349,14 @@ export default function ProfilePage() {
                 minLength={6}
               />
               {doPasswordsMatch === false && (
-                <p className={styles.inputFeedbackError}>Les mots de passe ne correspondent pas.</p>
+                <p className={styles.inputFeedbackError}>{t('profile.passwordsMismatch')}</p>
               )}
               {doPasswordsMatch === true && (
-                <p className={styles.inputFeedbackSuccess}>Les mots de passe correspondent.</p>
+                <p className={styles.inputFeedbackSuccess}>{t('profile.passwordsMatch')}</p>
               )}
             </div>
             <button type="submit" className={styles.button} disabled={isLoading || isCheckingPassword || isOldPasswordCorrect !== true}>
-              {isLoading ? 'Modification...' : 'Changer le mot de passe'}
+              {isLoading ? t('profile.changing') : t('profile.changePassword')}
             </button>
           </form>
 
@@ -354,7 +366,7 @@ export default function ProfilePage() {
             </div>
           )}
           <button type="button" className={styles.button} onClick={handleLogoutAll} disabled={isLoading}>
-            Fermer toutes les sessions
+            {t('profile.logoutAll')}
           </button>
         </div>
       </Card>

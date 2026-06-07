@@ -1,10 +1,16 @@
+'use client';
+
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { LanguageToggle } from '@/components/ui/LanguageToggle';
+import { useLanguage } from '@/context/LanguageContext';
 import { Activity, ShieldCheck, Zap } from 'lucide-react';
 import Link from 'next/link';
 import './home.css';
 
 export default function Home() {
+  const { t } = useLanguage();
+
   return (
     <main className="main-container">
       <nav className="navbar">
@@ -12,11 +18,12 @@ export default function Home() {
           <span className="logo-icon"></span> InvestX
         </div>
         <div className="nav-actions">
+          <LanguageToggle compact />
           <Link href="/auth/login">
-            <Button variant="ghost">Log In</Button>
+            <Button variant="ghost">{t('home.login')}</Button>
           </Link>
           <Link href="/auth/register">
-            <Button variant="primary">Start Trading</Button>
+            <Button variant="primary">{t('home.startTrading')}</Button>
           </Link>
         </div>
       </nav>
@@ -24,20 +31,20 @@ export default function Home() {
       <section className="hero-section">
         <div className="hero-content">
           <h1 className="hero-title">
-            The Next Generation of <span className="text-gradient">Simulated Trading</span>
+            {t('home.titleBefore')} <span className="text-gradient">{t('home.titleHighlight')}</span>
           </h1>
           <p className="hero-subtitle">
-            Experience real-time market action with a powerful, fast, and beautiful platform. Start with $100,000 and build your empire without risking a dime.
+            {t('home.subtitle')}
           </p>
           <div className="hero-cta">
             <Link href="/auth/register">
               <Button variant="primary" style={{ padding: '1rem 2rem', fontSize: '1.125rem' }}>
-                Open Free Account
+                {t('home.openAccount')}
               </Button>
             </Link>
             <Link href="/auth/login">
               <Button variant="secondary" style={{ padding: '1rem 2rem', fontSize: '1.125rem' }}>
-                Explore Platform
+                {t('home.explore')}
               </Button>
             </Link>
           </div>
@@ -77,18 +84,18 @@ export default function Home() {
       <section className="features-section">
         <div className="feature">
           <div className="feature-icon"><Zap size={24} /></div>
-          <h3>Lightning Fast</h3>
-          <p>Real-time data streams and atomic transaction processing for instant execution.</p>
+          <h3>{t('home.fastTitle')}</h3>
+          <p>{t('home.fastText')}</p>
         </div>
         <div className="feature">
           <div className="feature-icon"><Activity size={24} /></div>
-          <h3>Pro Analytics</h3>
-          <p>Deep dive into your portfolio performance with advanced charting and dynamic snapshots.</p>
+          <h3>{t('home.analyticsTitle')}</h3>
+          <p>{t('home.analyticsText')}</p>
         </div>
         <div className="feature">
           <div className="feature-icon"><ShieldCheck size={24} /></div>
-          <h3>100% Risk Free</h3>
-          <p>Practice trading strategies in a simulated environment mirroring real market conditions.</p>
+          <h3>{t('home.riskTitle')}</h3>
+          <p>{t('home.riskText')}</p>
         </div>
       </section>
     </main>

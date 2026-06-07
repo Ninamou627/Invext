@@ -6,11 +6,14 @@ import { ArrowLeft } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { LanguageToggle } from '@/components/ui/LanguageToggle';
+import { useLanguage } from '@/context/LanguageContext';
 import apiClient from '@/lib/api.client';
 import styles from '../auth.module.css';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -47,7 +50,7 @@ export default function RegisterPage() {
       if (err.response?.data?.code === 'VALIDATION_ERROR') {
         setValidationErrors(err.response.data.details);
       } else {
-        setError(err.response?.data?.error || 'Registration failed, please try again.');
+        setError(err.response?.data?.error || t('auth.registerError'));
       }
     } finally {
       setIsLoading(false);
@@ -57,13 +60,16 @@ export default function RegisterPage() {
   return (
     <div className={styles.authContainer}>
       <Link href="/" className={styles.backLink}>
-        <ArrowLeft size={16} /> Back to Home
+        <ArrowLeft size={16} /> {t('common.backHome')}
       </Link>
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
+        <LanguageToggle compact />
+      </div>
       
       <Card glass className={styles.authCard}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Create Account</h1>
-          <p className={styles.subtitle}>Start with $100,000 virtual capital</p>
+          <h1 className={styles.title}>{t('auth.registerTitle')}</h1>
+          <p className={styles.subtitle}>{t('auth.registerSubtitle')}</p>
         </div>
 
         {error && (
@@ -74,7 +80,7 @@ export default function RegisterPage() {
         
         {validationErrors.length > 0 && (
           <div className={styles.errorsBanner} style={{ marginBottom: '1.5rem' }}>
-            <strong>Please fix the following:</strong>
+            <strong>{t('auth.validationTitle')}</strong>
             <ul>
               {validationErrors.map((err, i) => <li key={i}>{err.message}</li>)}
             </ul>
@@ -83,7 +89,7 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <Input 
-            label="Email" 
+            label={t('common.email')}
             id="email"
             type="email" 
             value={formData.email}
@@ -92,7 +98,7 @@ export default function RegisterPage() {
             placeholder="john@investx.com" 
           />
           <Input 
-            label="Username" 
+            label={t('common.username')}
             id="username"
             type="text" 
             value={formData.username}
@@ -101,7 +107,7 @@ export default function RegisterPage() {
             placeholder="johndoe" 
           />
           <Input 
-            label="Password" 
+            label={t('common.password')}
             id="password"
             type="password" 
             value={formData.password}
@@ -111,12 +117,12 @@ export default function RegisterPage() {
           />
           
           <Button type="submit" isLoading={isLoading} style={{ marginTop: '0.5rem' }}>
-            Create Account
+            {t('auth.registerButton')}
           </Button>
         </form>
 
         <div className={styles.footer}>
-          Already have an account? <Link href="/auth/login">Sign in</Link>
+          {t('auth.hasAccount')} <Link href="/auth/login">{t('auth.signin')}</Link>
         </div>
       </Card>
     </div>

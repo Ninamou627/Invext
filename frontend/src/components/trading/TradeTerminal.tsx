@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import apiClient from '@/lib/api.client';
 import { convertUsdToCurrency, getCurrencySymbol, formatCurrency } from '@/lib/currency';
 import { OrderBook } from './OrderBook';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface TradeTerminalProps {
   currentSymbol: string;
@@ -14,6 +15,7 @@ interface TradeTerminalProps {
 }
 
 export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: TradeTerminalProps) {
+  const { t } = useLanguage();
   const [side, setSide] = useState<'BUY' | 'SELL'>('BUY');
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
   const [quantity, setQuantity] = useState<string>('1');
@@ -75,7 +77,7 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
           ticker: currentSymbol,
           quantity: parseFloat(quantity)
         });
-        setSuccess(`Market ${side} order executed successfully!`);
+        setSuccess(t('trade.successMarket', { side: side === 'BUY' ? t('trade.buy') : t('trade.sell') }));
       } else {
         await apiClient.post('/trading/orders', {
           ticker: currentSymbol,
@@ -83,7 +85,10 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
           quantity: parseFloat(quantity),
           limitPrice: parseFloat(limitPrice)
         });
-        setSuccess(`Limit ${side} order placed at ${formatCurrency(parseFloat(limitPrice), preferredCurrency)}.`);
+        setSuccess(t('trade.successLimit', {
+          side: side === 'BUY' ? t('trade.buy') : t('trade.sell'),
+          price: formatCurrency(parseFloat(limitPrice), preferredCurrency),
+        }));
       }
       
       if (onTradeSuccess) onTradeSuccess();
@@ -93,7 +98,7 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
         window.dispatchEvent(new Event('update-portfolio'));
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || `Failed to place ${side} order.`);
+      setError(err.response?.data?.error || t('trade.error', { side: side === 'BUY' ? t('trade.buy') : t('trade.sell') }));
     } finally {
       setIsLoading(false);
     }
@@ -119,13 +124,13 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
             style={{ flex: 1, backgroundColor: side === 'BUY' ? 'var(--accent-success)' : 'transparent', color: side === 'BUY' ? '#000' : 'var(--text-primary)' }}
             onClick={() => setSide('BUY')}
           >
-            Buy
+            {t('trade.buy')}
           </Button>
           <Button 
             style={{ flex: 1, backgroundColor: side === 'SELL' ? 'var(--accent-danger)' : 'transparent', color: side === 'SELL' ? '#000' : 'var(--text-primary)' }}
             onClick={() => setSide('SELL')}
           >
-            Sell
+            {t('trade.sell')}
           </Button>
         </div>
 
@@ -134,13 +139,13 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
             style={{ background: 'none', border: 'none', color: orderType === 'MARKET' ? 'var(--accent-primary)' : 'var(--text-secondary)', fontWeight: orderType === 'MARKET' ? 600 : 400, cursor: 'pointer' }}
             onClick={() => setOrderType('MARKET')}
           >
-            Market
+            {t('trade.market')}
           </button>
           <button 
             style={{ background: 'none', border: 'none', color: orderType === 'LIMIT' ? 'var(--accent-primary)' : 'var(--text-secondary)', fontWeight: orderType === 'LIMIT' ? 600 : 400, cursor: 'pointer' }}
             onClick={() => setOrderType('LIMIT')}
           >
-            Limit
+            {t('trade.limit')}
           </button>
         </div>
 
@@ -149,9 +154,9 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
           {success && <div style={{ color: 'var(--accent-success)', fontSize: '0.875rem' }}>{success}</div>}
 
           <Input 
-            label={orderType === 'MARKET' ? `Price (Market) (${currencySymbol})` : `Limit Price (${currencySymbol})`} 
+            label={orderType === 'MARKET' ? `${t('trade.marketPrice')} (${currencySymbol})` : `${t('trade.limitPrice')} (${currencySymbol})`}
             disabled={orderType === 'MARKET'} 
-            value={orderType === 'MARKET' ? (displayPrice ? displayPrice.toFixed(2) : 'Loading...') : limitPrice}
+            value={orderType === 'MARKET' ? (displayPrice ? displayPrice.toFixed(2) : t('trade.loadingPrice')) : limitPrice}
             onChange={(e) => setLimitPrice(e.target.value)}
             type="number"
             step="0.01"
@@ -159,7 +164,7 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
           />
 
           <Input 
-            label="Quantity (Shares)" 
+            label={t('trade.quantity')}
             type="number" 
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
@@ -169,7 +174,7 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
           />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', color: 'var(--text-secondary)' }}>
-            <span>Estimated Total:</span>
+            <span>{t('trade.estimatedTotal')}</span>
             <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
               {orderType === 'MARKET'
                 ? (estimatedValueNum !== null ? formatCurrency(estimatedValueNum, preferredCurrency) : '--')
@@ -187,7 +192,7 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
               marginTop: '0.5rem'
             }}
           >
-            {side} {currentSymbol}
+            {side === 'BUY' ? t('trade.buy').toUpperCase() : t('trade.sell').toUpperCase()} {currentSymbol}
           </Button>
         </form>
       </Card>
@@ -199,17 +204,17 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
       {pendingOrders.length > 0 && (
         <Card glass style={{ marginTop: '1rem', padding: '1.25rem' }}>
           <h4 style={{ marginBottom: '1rem', fontSize: '0.85rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
-            Pending Orders
+            {t('trade.pendingOrders')}
           </h4>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--border-light)', color: 'var(--text-muted)', textAlign: 'left' }}>
-                  <th style={{ padding: '0.5rem 0' }}>Asset</th>
-                  <th>Side</th>
-                  <th>Price</th>
-                  <th>Filled</th>
-                  <th style={{ textAlign: 'right' }}>Action</th>
+                  <th style={{ padding: '0.5rem 0' }}>{t('trade.asset')}</th>
+                  <th>{t('trade.side')}</th>
+                  <th>{t('trade.price')}</th>
+                  <th>{t('trade.filled')}</th>
+                  <th style={{ textAlign: 'right' }}>{t('trade.action')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -224,7 +229,7 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
                       <td>
                         {order.limitPrice 
                           ? formatCurrency(convertUsdToCurrency(Number(order.limitPrice), preferredCurrency), preferredCurrency)
-                          : 'Market'}
+                          : t('trade.market')}
                       </td>
                       <td>{filledQty}/{totalQty}</td>
                       <td style={{ textAlign: 'right' }}>
@@ -250,7 +255,7 @@ export function TradeTerminal({ currentSymbol, currentPrice, onTradeSuccess }: T
                             e.currentTarget.style.color = '#ef4444';
                           }}
                         >
-                          Cancel
+                          {t('trade.cancel')}
                         </button>
                       </td>
                     </tr>

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import apiClient from '@/lib/api.client';
 import { Bell, X } from 'lucide-react';
 import { getCurrencySymbol } from '@/lib/currency';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Alert {
   id: string;
@@ -14,6 +15,7 @@ interface Alert {
 }
 
 export function AlertNotifier() {
+  const { t } = useLanguage();
   const [notifications, setNotifications] = useState<Alert[]>([]);
   const [preferredCurrency, setPreferredCurrency] = useState('USD');
 
@@ -100,9 +102,13 @@ export function AlertNotifier() {
             <Bell size={24} />
           </div>
           <div style={{ flex: 1 }}>
-            <h4 style={{ margin: '0 0 0.25rem 0', color: 'var(--text-primary)', fontSize: '0.875rem' }}>Price Alert Triggered!</h4>
+            <h4 style={{ margin: '0 0 0.25rem 0', color: 'var(--text-primary)', fontSize: '0.875rem' }}>{t('notifier.title')}</h4>
             <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: '1.4' }}>
-              <strong>{notification.ticker}</strong> has gone {notification.condition.toLowerCase()} your target of <strong>{getCurrencySymbol(preferredCurrency)}{Number(notification.targetPrice).toFixed(2)}</strong>.
+              {t('notifier.body', {
+                ticker: notification.ticker,
+                condition: notification.condition.toLowerCase(),
+                price: `${getCurrencySymbol(preferredCurrency)}${Number(notification.targetPrice).toFixed(2)}`,
+              })}
             </p>
           </div>
           <button 

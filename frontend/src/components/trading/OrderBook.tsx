@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import apiClient from '@/lib/api.client';
 import { convertUsdToCurrency, formatCurrency } from '@/lib/currency';
 import styles from './OrderBook.module.css';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface OrderBookProps {
   ticker: string;
@@ -15,6 +16,7 @@ interface BookEntry {
 }
 
 export function OrderBook({ ticker, preferredCurrency }: OrderBookProps) {
+  const { t } = useLanguage();
   const [bids, setBids] = useState<BookEntry[]>([]);
   const [asks, setAsks] = useState<BookEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,22 +64,22 @@ export function OrderBook({ ticker, preferredCurrency }: OrderBookProps) {
 
   return (
     <div className={styles.container}>
-      <h4 className={styles.title}>Order Book ({ticker})</h4>
+      <h4 className={styles.title}>{t('orderbook.title')} ({ticker})</h4>
       
       {loading ? (
-        <div className={styles.loading}>Loading depth...</div>
+        <div className={styles.loading}>{t('orderbook.loading')}</div>
       ) : (
         <div className={styles.bookGrid}>
           {/* Header */}
           <div className={styles.bookHeader}>
-            <span>Price</span>
-            <span style={{ textAlign: 'right' }}>Size</span>
+            <span>{t('orderbook.price')}</span>
+            <span style={{ textAlign: 'right' }}>{t('orderbook.size')}</span>
           </div>
 
           {/* Asks (Sell orders) - Red */}
           <div className={styles.section}>
             {sortedAsks.length === 0 ? (
-              <div className={styles.empty}>No asks</div>
+              <div className={styles.empty}>{t('orderbook.noAsks')}</div>
             ) : (
               sortedAsks.map((ask, idx) => {
                 const depthPct = (ask.quantity / maxQty) * 100;
@@ -103,18 +105,18 @@ export function OrderBook({ ticker, preferredCurrency }: OrderBookProps) {
           <div className={styles.spreadBar}>
             {spread !== null ? (
               <>
-                <span>Spread: {formatCurrency(convertUsdToCurrency(spread, preferredCurrency), preferredCurrency)}</span>
+                <span>{t('orderbook.spread')}: {formatCurrency(convertUsdToCurrency(spread, preferredCurrency), preferredCurrency)}</span>
                 <span>({spreadPct?.toFixed(2)}%)</span>
               </>
             ) : (
-              <span>No Spread</span>
+              <span>{t('orderbook.noSpread')}</span>
             )}
           </div>
 
           {/* Bids (Buy orders) - Green */}
           <div className={styles.section}>
             {bids.length === 0 ? (
-              <div className={styles.empty}>No bids</div>
+              <div className={styles.empty}>{t('orderbook.noBids')}</div>
             ) : (
               bids.map((bid, idx) => {
                 const depthPct = (bid.quantity / maxQty) * 100;

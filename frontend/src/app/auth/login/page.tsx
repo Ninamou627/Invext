@@ -6,11 +6,14 @@ import { ArrowLeft } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
+import { LanguageToggle } from '@/components/ui/LanguageToggle';
+import { useLanguage } from '@/context/LanguageContext';
 import apiClient from '@/lib/api.client';
 import styles from '../auth.module.css';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +35,7 @@ export default function LoginPage() {
 
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to login, please try again.');
+      setError(err.response?.data?.error || t('auth.loginError'));
     } finally {
       setIsLoading(false);
     }
@@ -41,13 +44,16 @@ export default function LoginPage() {
   return (
     <div className={styles.authContainer}>
       <Link href="/" className={styles.backLink}>
-        <ArrowLeft size={16} /> Back to Home
+        <ArrowLeft size={16} /> {t('common.backHome')}
       </Link>
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
+        <LanguageToggle compact />
+      </div>
       
       <Card glass className={styles.authCard}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Welcome Back</h1>
-          <p className={styles.subtitle}>Enter your credentials to access your account</p>
+          <h1 className={styles.title}>{t('auth.loginTitle')}</h1>
+          <p className={styles.subtitle}>{t('auth.loginSubtitle')}</p>
         </div>
 
         {error && (
@@ -58,7 +64,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <Input 
-            label="Email" 
+            label={t('common.email')}
             type="email" 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -66,7 +72,7 @@ export default function LoginPage() {
             placeholder="john@example.com" 
           />
           <Input 
-            label="Password" 
+            label={t('common.password')}
             type="password" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -75,12 +81,12 @@ export default function LoginPage() {
           />
           
           <Button type="submit" isLoading={isLoading} style={{ marginTop: '0.5rem' }}>
-            Login to Dashboard
+            {t('auth.loginButton')}
           </Button>
         </form>
 
         <div className={styles.footer}>
-          Don't have an account? <Link href="/auth/register">Sign up</Link>
+          {t('auth.noAccount')} <Link href="/auth/register">{t('auth.signup')}</Link>
         </div>
       </Card>
     </div>

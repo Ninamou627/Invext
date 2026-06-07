@@ -6,6 +6,7 @@ import apiClient from '@/lib/api.client';
 import styles from './overview.module.css';
 import { formatCurrency } from '@/lib/currency';
 import { Wallet, TrendingUp, PieChart } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   LineChart,
   Line,
@@ -33,6 +34,7 @@ interface Snapshot {
 }
 
 export default function OverviewPage() {
+  const { language, t } = useLanguage();
   const [dashboard, setDashboard] = useState<PortfolioDashboard | null>(null);
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,24 +63,25 @@ export default function OverviewPage() {
   }, []);
 
   if (loading || !dashboard) {
-    return <div className={styles.loading}>Loading Overview...</div>;
+    return <div className={styles.loading}>{t('common.loading')}</div>;
   }
 
   // Prepare chart data
+  const locale = language === 'fr' ? 'fr-FR' : 'en-US';
   const chartData = snapshots.map(snap => ({
-    date: new Date(snap.snapshotAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+    date: new Date(snap.snapshotAt).toLocaleDateString(locale, { month: 'short', day: 'numeric' }),
     value: snap.totalValue
   }));
 
   const today = new Date();
-  const todayStr = today.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const todayStr = today.toLocaleDateString(locale, { month: 'short', day: 'numeric' });
 
   if (chartData.length === 0) {
     // Si aucun snapshot, créer une ligne plate d'hier à aujourd'hui
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     chartData.push({ 
-      date: yesterday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), 
+      date: yesterday.toLocaleDateString(locale, { month: 'short', day: 'numeric' }),
       value: dashboard.totalPortfolioValue 
     });
     chartData.push({ date: todayStr, value: dashboard.totalPortfolioValue });
@@ -93,7 +96,7 @@ export default function OverviewPage() {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
       chartData.unshift({ 
-        date: yesterday.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), 
+        date: yesterday.toLocaleDateString(locale, { month: 'short', day: 'numeric' }),
         value: chartData[0].value 
       });
     }
@@ -102,15 +105,15 @@ export default function OverviewPage() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Vue d'ensemble</h1>
-        <p className={styles.subtitle}>Suivez la performance globale de votre portefeuille.</p>
+        <h1 className={styles.title}>{t('overview.title')}</h1>
+        <p className={styles.subtitle}>{t('overview.subtitle')}</p>
       </header>
 
       {/* Summary Cards */}
       <div className={styles.summaryGrid}>
         <Card glass className={styles.summaryCard}>
           <div className={styles.cardTitle}>
-            <PieChart size={18} /> Valeur Totale
+            <PieChart size={18} /> {t('overview.totalValue')}
           </div>
           <div className={styles.cardValue}>
             {formatCurrency(dashboard.totalPortfolioValue, currency)}
@@ -119,7 +122,7 @@ export default function OverviewPage() {
 
         <Card glass className={styles.summaryCard}>
           <div className={styles.cardTitle}>
-            <Wallet size={18} /> Cash Disponible
+            <Wallet size={18} /> {t('overview.cash')}
           </div>
           <div className={styles.cardValue}>
             {formatCurrency(dashboard.cashBalance, currency)}
@@ -128,7 +131,7 @@ export default function OverviewPage() {
 
         <Card glass className={styles.summaryCard}>
           <div className={styles.cardTitle}>
-            <TrendingUp size={18} /> Profit / Perte Total
+            <TrendingUp size={18} /> {t('overview.totalPL')}
           </div>
           <div className={styles.cardValue}>
             <span className={dashboard.totalPL >= 0 ? styles.positive : styles.negative}>
@@ -137,14 +140,14 @@ export default function OverviewPage() {
           </div>
           <div className={`${styles.cardChange} ${dashboard.totalPLPercentage >= 0 ? styles.positive : styles.negative}`}>
             {dashboard.totalPLPercentage > 0 ? '↑' : dashboard.totalPLPercentage < 0 ? '↓' : ''} 
-            {Math.abs(dashboard.totalPLPercentage)}% (Tous les temps)
+            {Math.abs(dashboard.totalPLPercentage)}% ({t('overview.allTime')})
           </div>
         </Card>
       </div>
 
       {/* Chart Section */}
       <Card glass className={styles.chartSection}>
-        <h2 className={styles.chartTitle}>Évolution du Compte (30 Derniers Jours)</h2>
+        <h2 className={styles.chartTitle}>{t('overview.accountEvolution')}</h2>
         <div className={styles.chartContainer}>
           {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -161,7 +164,7 @@ export default function OverviewPage() {
                 <YAxis 
                   stroke="var(--text-muted)" 
                   tick={{ fill: 'var(--text-muted)', fontSize: 12 }}
-                  tickFormatter={(val) => new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(val)}
+                  tickFormatter={(val) => new Intl.NumberFormat(locale, { style: 'currency', currency, maximumFractionDigits: 0 }).format(val)}
                   axisLine={false}
                   tickLine={false}
                   domain={['auto', 'auto']}
@@ -185,7 +188,7 @@ export default function OverviewPage() {
             </ResponsiveContainer>
           ) : (
             <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-              Pas assez de données pour générer le graphique.
+              {t('overview.notEnoughData')}
             </div>
           )}
         </div>

@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card';
 import apiClient from '@/lib/api.client';
 import { Trophy } from 'lucide-react';
 import { getCurrencySymbol } from '@/lib/currency';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface LeaderboardUser {
   userId: string;
@@ -14,6 +15,7 @@ interface LeaderboardUser {
 }
 
 export default function LeaderboardPage() {
+  const { t } = useLanguage();
   const [leaders, setLeaders] = useState<LeaderboardUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,14 +39,14 @@ export default function LeaderboardPage() {
         <div style={{ padding: '0.75rem', background: 'rgba(255,215,0,0.1)', borderRadius: '12px', color: '#FFD700' }}>
           <Trophy size={32} />
         </div>
-        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>Global Rankings</h1>
+        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2rem' }}>{t('leaderboard.title')}</h1>
       </div>
       
       <Card glass>
         {isLoading ? (
-          <p style={{ color: 'var(--text-secondary)' }}>Loading competitive rankings...</p>
+          <p style={{ color: 'var(--text-secondary)' }}>{t('leaderboard.loading')}</p>
         ) : leaders.length === 0 ? (
-          <p style={{ color: 'var(--text-secondary)' }}>No trading data available yet.</p>
+          <p style={{ color: 'var(--text-secondary)' }}>{t('leaderboard.empty')}</p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {leaders.map((user, index) => {

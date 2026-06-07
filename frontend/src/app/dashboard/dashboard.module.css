@@ -123,6 +123,16 @@
   background: var(--accent-danger-glow);
 }
 
+.sidebarLanguage {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.collapsed .sidebarLanguage {
+  justify-content: center;
+}
+
 .mainContent {
   flex: 1;
   display: flex;

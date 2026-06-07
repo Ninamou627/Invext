@@ -8,6 +8,7 @@ import { TradeTerminal } from '@/components/trading/TradeTerminal';
 import apiClient from '@/lib/api.client';
 import { convertUsdToCurrency, formatCurrency } from '@/lib/currency';
 import { useMarket } from '@/context/MarketContext';
+import { useLanguage } from '@/context/LanguageContext';
 import styles from './asset.module.css';
 
 interface Quote {
@@ -19,6 +20,7 @@ interface Quote {
 }
 
 export function AssetDetailClient({ symbol }: { symbol: string }) {
+  const { t } = useLanguage();
   const { activeSymbol, setActiveSymbol, price, direction } = useMarket();
   const [quote, setQuote] = useState<Quote | null>(null);
   const [currency, setCurrency] = useState('USD');
@@ -69,9 +71,9 @@ export function AssetDetailClient({ symbol }: { symbol: string }) {
     : '--';
 
   const getDirectionLabel = () => {
-    if (direction === 'up') return 'Up';
-    if (direction === 'down') return 'Down';
-    return 'Live';
+    if (direction === 'up') return t('asset.up');
+    if (direction === 'down') return t('asset.down');
+    return t('asset.live');
   };
 
   const metric = (label: string, value?: number) => (
@@ -90,16 +92,16 @@ export function AssetDetailClient({ symbol }: { symbol: string }) {
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>{symbol}</h1>
-          <p className={styles.subtitle}>Asset details, live price and order entry.</p>
+          <p className={styles.subtitle}>{t('asset.subtitle')}</p>
         </div>
         <div className={styles.liveBadge}>
-          <span className={styles.liveLabel}>{getDirectionLabel()} price</span>
+          <span className={styles.liveLabel}>{t('asset.livePrice', { status: getDirectionLabel() })}</span>
           <span className={styles.livePrice}>{formattedLivePrice}</span>
         </div>
       </header>
 
       {loading ? (
-        <Card glass className={styles.status}>Loading asset details...</Card>
+        <Card glass className={styles.status}>{t('asset.loading')}</Card>
       ) : error ? (
         <Card glass className={styles.status}>{error}</Card>
       ) : (
@@ -108,13 +110,13 @@ export function AssetDetailClient({ symbol }: { symbol: string }) {
             <CandlestickChart symbol={symbol} currency={currency} livePrice={displayPrice} />
             <SentimentWidget symbol={symbol} />
 
-            <h2 className={styles.sectionTitle}>Market Snapshot</h2>
+            <h2 className={styles.sectionTitle}>{t('asset.snapshot')}</h2>
             <div className={styles.quoteGrid}>
-              {metric('Current', quote?.c)}
-              {metric('Open', quote?.o)}
-              {metric('High', quote?.h)}
-              {metric('Low', quote?.l)}
-              {metric('Previous Close', quote?.pc)}
+              {metric(t('asset.current'), quote?.c)}
+              {metric(t('asset.open'), quote?.o)}
+              {metric(t('asset.high'), quote?.h)}
+              {metric(t('asset.low'), quote?.l)}
+              {metric(t('asset.previousClose'), quote?.pc)}
             </div>
           </section>
 

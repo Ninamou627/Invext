@@ -7,6 +7,7 @@ import { AdvancedRealTimeChart } from 'react-ts-tradingview-widgets';
 import { Card } from '@/components/ui/Card';
 import apiClient from '@/lib/api.client';
 import { formatCurrency } from '@/lib/currency';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Holding {
   id: string;
@@ -22,6 +23,7 @@ interface Holding {
 
 export default function DashboardHome() {
   const { activeSymbol, price } = useMarket();
+  const { language, t } = useLanguage();
   const [holdings, setHoldings] = useState<Holding[]>([]);
   const [positionsLoading, setPositionsLoading] = useState(true);
 
@@ -71,7 +73,7 @@ export default function DashboardHome() {
           symbol={activeSymbol}
           timezone="Etc/UTC"
           style="1"
-          locale="fr"
+          locale={language}
           enable_publishing={false}
           allow_symbol_change={true}
           details={false}
@@ -81,18 +83,18 @@ export default function DashboardHome() {
 
       {/* RIGHT COLUMN: Terminal Engine */}
       <div style={{ padding: '1.5rem', background: 'var(--bg-surface)', overflowY: 'auto' }}>
-        <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', color: 'var(--text-primary)' }}>Trading Terminal</h3>
+        <h3 style={{ marginBottom: '1.5rem', fontSize: '1.25rem', color: 'var(--text-primary)' }}>{t('dashboard.tradingTerminal')}</h3>
         <TradeTerminal
           currentSymbol={activeSymbol}
           currentPrice={price}
         />
 
         <Card style={{ marginTop: '1.5rem', padding: '1rem' }}>
-          <h4 className={styles.positionsTitle}>Open Positions</h4>
+          <h4 className={styles.positionsTitle}>{t('dashboard.openPositions')}</h4>
           {positionsLoading ? (
-            <p className={styles.positionsEmpty}>Loading positions...</p>
+            <p className={styles.positionsEmpty}>{t('dashboard.loadingPositions')}</p>
           ) : orderedHoldings.length === 0 ? (
-            <p className={styles.positionsEmpty}>Your portfolio has no holdings yet.</p>
+            <p className={styles.positionsEmpty}>{t('dashboard.noHoldings')}</p>
           ) : (
             <div className={styles.positionsList}>
               {orderedHoldings.map((holding) => {
@@ -104,7 +106,7 @@ export default function DashboardHome() {
                     <div>
                       <div className={styles.positionTicker}>{holding.ticker}</div>
                       <div className={styles.positionMeta}>
-                        Qty {holding.quantity.toLocaleString(undefined, { maximumFractionDigits: 6 })}
+                        {t('dashboard.quantityShort')} {holding.quantity.toLocaleString(undefined, { maximumFractionDigits: 6 })}
                       </div>
                     </div>
                     <div className={styles.positionNumbers}>
@@ -116,8 +118,8 @@ export default function DashboardHome() {
                       </span>
                     </div>
                     <div className={styles.positionDetails}>
-                      <span>Avg {formatCurrency(holding.avgBuyPrice, holding.currency)}</span>
-                      <span>Now {formatCurrency(holding.currentPrice, holding.currency)}</span>
+                      <span>{t('dashboard.average')} {formatCurrency(holding.avgBuyPrice, holding.currency)}</span>
+                      <span>{t('dashboard.now')} {formatCurrency(holding.currentPrice, holding.currency)}</span>
                     </div>
                   </div>
                 );

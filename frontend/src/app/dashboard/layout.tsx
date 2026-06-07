@@ -19,6 +19,8 @@ import apiClient from '@/lib/api.client';
 import { MarketProvider, useMarket } from '@/context/MarketContext';
 import { Search } from 'lucide-react';
 import { AlertNotifier } from '@/components/ui/AlertNotifier';
+import { LanguageToggle } from '@/components/ui/LanguageToggle';
+import { useLanguage } from '@/context/LanguageContext';
 import { convertUsdToCurrency, formatCurrency, refreshExchangeRates } from '@/lib/currency';
 
 type AssetOption = {
@@ -41,6 +43,7 @@ const MARKET_SHORTCUTS: AssetOption[] = [
 function DashboardHeader({ user, profile }: { user: any, profile: any }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useLanguage();
   const { activeSymbol, setActiveSymbol, price, direction } = useMarket();
   const [input, setInput] = useState(activeSymbol);
   const [searchResults, setSearchResults] = useState<AssetOption[]>([]);
@@ -185,14 +188,14 @@ function DashboardHeader({ user, profile }: { user: any, profile: any }) {
                 e.currentTarget.blur();
               }
             }}
-            placeholder="Search symbol..."
+            placeholder={t('search.placeholder')}
             className={styles.headerInput}
           />
         </form>
         {showResults && (
           <div className={styles.searchResults}>
             <div className={styles.marketShortcuts}>
-              <div className={styles.shortcutLabel}>Marches rapides</div>
+              <div className={styles.shortcutLabel}>{t('search.quickMarkets')}</div>
               <div className={styles.shortcutGrid}>
                 {MARKET_SHORTCUTS.map((asset) => (
                   <button
@@ -210,9 +213,9 @@ function DashboardHeader({ user, profile }: { user: any, profile: any }) {
             </div>
 
             {isSearching ? (
-              <div className={styles.searchState}>Searching...</div>
+              <div className={styles.searchState}>{t('search.searching')}</div>
             ) : searchResults.length === 0 && query.length > 0 ? (
-              <div className={styles.searchState}>Aucun marche trouve</div>
+              <div className={styles.searchState}>{t('search.noAssets')}</div>
             ) : (
               searchResults.map((asset) => (
                 <button
@@ -246,7 +249,7 @@ function DashboardHeader({ user, profile }: { user: any, profile: any }) {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{profile?.username || 'User'}</span>
           <span style={{ position: 'relative' }} className={flash === 'green' ? styles.flashGreen : flash === 'red' ? styles.flashRed : ''}>
-            Capital: {formatCurrency(Number(user?.cashBalance) || 100000, profile?.preferredCurrency || 'USD')}
+            {t('common.capital')}: {formatCurrency(Number(user?.cashBalance) || 100000, profile?.preferredCurrency || 'USD')}
             {diffAmount !== null && (
               <span
                 key={diffKey}
@@ -269,6 +272,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -351,56 +355,60 @@ export default function DashboardLayout({
             <Link 
               href="/dashboard/overview" 
               className={`${styles.navItem} ${pathname === '/dashboard/overview' ? styles.active : ''}`}
-              title={isCollapsed ? "Vue d'ensemble" : ""}
+              title={isCollapsed ? t('nav.overview') : ""}
             >
               <PieChart size={20} />
-              {!isCollapsed && <span>Vue d'ensemble</span>}
+              {!isCollapsed && <span>{t('nav.overview')}</span>}
             </Link>
             <Link 
               href="/dashboard" 
               className={`${styles.navItem} ${pathname === '/dashboard' ? styles.active : ''}`}
-              title={isCollapsed ? "Terminal O-P" : ""}
+              title={isCollapsed ? t('nav.terminal') : ""}
             >
               <LayoutDashboard size={20} />
-              {!isCollapsed && <span>Terminal O-P</span>}
+              {!isCollapsed && <span>{t('nav.terminal')}</span>}
             </Link>
             <Link 
               href="/dashboard/history" 
               className={`${styles.navItem} ${pathname === '/dashboard/history' ? styles.active : ''}`}
-              title={isCollapsed ? "History" : ""}
+              title={isCollapsed ? t('nav.history') : ""}
             >
               <Wallet size={20} />
-              {!isCollapsed && <span>History</span>}
+              {!isCollapsed && <span>{t('nav.history')}</span>}
             </Link>
             <Link 
               href="/dashboard/alerts" 
               className={`${styles.navItem} ${pathname === '/dashboard/alerts' ? styles.active : ''}`}
-              title={isCollapsed ? "Alerts" : ""}
+              title={isCollapsed ? t('nav.alerts') : ""}
             >
               <Bell size={20} />
-              {!isCollapsed && <span>Alerts</span>}
+              {!isCollapsed && <span>{t('nav.alerts')}</span>}
             </Link>
             <Link 
               href="/dashboard/leaderboard" 
               className={`${styles.navItem} ${pathname === '/dashboard/leaderboard' ? styles.active : ''}`}
-              title={isCollapsed ? "Leaderboard" : ""}
+              title={isCollapsed ? t('nav.leaderboard') : ""}
             >
               <Trophy size={20} />
-              {!isCollapsed && <span>Leaderboard</span>}
+              {!isCollapsed && <span>{t('nav.leaderboard')}</span>}
             </Link>
             <Link 
               href="/dashboard/profile" 
               className={`${styles.navItem} ${pathname === '/dashboard/profile' ? styles.active : ''}`}
-              title={isCollapsed ? "Settings" : ""}
+              title={isCollapsed ? t('nav.settings') : ""}
             >
               <Settings size={20} />
-              {!isCollapsed && <span>Settings</span>}
+              {!isCollapsed && <span>{t('nav.settings')}</span>}
             </Link>
           </nav>
 
-          <button className={styles.logoutBtn} onClick={handleLogout} title={isCollapsed ? "Logout" : ""}>
+          <div className={styles.sidebarLanguage}>
+            <LanguageToggle compact />
+          </div>
+
+          <button className={styles.logoutBtn} onClick={handleLogout} title={isCollapsed ? t('nav.logout') : ""}>
             <LogOut size={20} />
-            {!isCollapsed && <span>Logout</span>}
+            {!isCollapsed && <span>{t('nav.logout')}</span>}
           </button>
         </aside>
 

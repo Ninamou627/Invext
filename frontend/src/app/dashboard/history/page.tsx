@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import apiClient from '@/lib/api.client';
 import styles from './history.module.css';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Transaction {
   id: string;
@@ -17,6 +18,7 @@ interface Transaction {
 }
 
 export default function HistoryPage() {
+  const { language, t } = useLanguage();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -41,14 +43,14 @@ export default function HistoryPage() {
 
   const formatDate = (dateString: string) => {
     const d = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(language === 'fr' ? 'fr-FR' : 'en-US', {
       dateStyle: 'medium',
       timeStyle: 'short',
     }).format(d);
   };
 
   const formatCurrency = (val: number, currency: string) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(language === 'fr' ? 'fr-FR' : 'en-US', {
       style: 'currency',
       currency: currency || 'USD',
     }).format(val);
@@ -57,27 +59,27 @@ export default function HistoryPage() {
   return (
     <div className={styles.container}>
       <div>
-        <h1 className={styles.title}>Transaction History</h1>
-        <p className={styles.subtitle}>Review your past trades and financial activity.</p>
+        <h1 className={styles.title}>{t('history.title')}</h1>
+        <p className={styles.subtitle}>{t('history.subtitle')}</p>
       </div>
 
       <Card glass>
         <div className={styles.tableContainer}>
           {loading ? (
-            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>Loading history...</div>
+            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t('history.loading')}</div>
           ) : transactions.length === 0 ? (
-            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No transactions found.</div>
+            <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>{t('history.empty')}</div>
           ) : (
             <>
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Asset</th>
-                    <th>Type</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                    <th>Total</th>
+                    <th>{t('history.date')}</th>
+                    <th>{t('trade.asset')}</th>
+                    <th>{t('history.type')}</th>
+                    <th>{t('history.quantity')}</th>
+                    <th>{t('trade.price')}</th>
+                    <th>{t('history.total')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -98,21 +100,21 @@ export default function HistoryPage() {
                 </tbody>
               </table>
               <div className={styles.pagination}>
-                <span className={styles.pageInfo}>Page {page} of {totalPages}</span>
+                <span className={styles.pageInfo}>{t('history.page', { page, totalPages })}</span>
                 <div className={styles.pageControls}>
                   <button 
                     className={styles.pageBtn} 
                     disabled={page <= 1} 
                     onClick={() => setPage(p => p - 1)}
                   >
-                    Previous
+                    {t('history.previous')}
                   </button>
                   <button 
                     className={styles.pageBtn} 
                     disabled={page >= totalPages} 
                     onClick={() => setPage(p => p + 1)}
                   >
-                    Next
+                    {t('history.next')}
                   </button>
                 </div>
               </div>
