@@ -298,3 +298,28 @@ npm run start
 ```
 
 En production, configurez les variables d'environnement sur la plateforme d'hébergement au lieu d'utiliser des fichiers `.env` locaux.
+
+## Deploiement du frontend sur Render
+
+Le frontend est une application Next.js. Sur Render, il faut la deployer comme un **Web Service Node**, pas comme un Static Site, sauf si vous transformez explicitement l'application en export statique.
+
+Configuration recommandee pour le service frontend:
+
+```text
+Service Type: Web Service
+Root Directory: frontend
+Runtime: Node
+Build Command: npm ci && npm run build
+Start Command: npm run start
+```
+
+Variables d'environnement a ajouter dans Render:
+
+```env
+NODE_VERSION=20.18.0
+NEXT_PUBLIC_API_URL=https://URL-DU-BACKEND-RENDER/api
+```
+
+Ne mettez pas de `Publish Directory` pour ce mode. L'erreur `Publish directory dist does not exist` signifie que Render a ete configure comme Static Site avec `dist`, mais Next.js ne genere pas ce dossier avec `next build`.
+
+Si vous choisissez vraiment un Static Site Render, il faudrait configurer Next avec un export statique et publier `out`, mais ce mode est moins adapte ici car l'application contient des routes dashboard et une route dynamique d'actif.
