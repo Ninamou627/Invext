@@ -7,6 +7,18 @@ export interface MarketTick {
   v: number; // Volume
 }
 
+const getWebSocketUrl = () => {
+  if (process.env.NEXT_PUBLIC_WS_URL) {
+    return process.env.NEXT_PUBLIC_WS_URL;
+  }
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5005/api';
+  const backendUrl = new URL(apiUrl);
+  backendUrl.pathname = backendUrl.pathname.replace(/\/api\/?$/, '');
+  backendUrl.protocol = backendUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+  return backendUrl.toString();
+};
+
 export function useMarketStream(symbol: string) {
   const [price, setPrice] = useState<number | null>(null);
   const [prevPrice, setPrevPrice] = useState<number | null>(null);
@@ -22,8 +34,7 @@ export function useMarketStream(symbol: string) {
     setPrevPrice(null);
     setDirection('neutral');
 
-    // In a real app we'd construct ws:// or wss:// from process.env.NEXT_PUBLIC_API_URL
-    const ws = new WebSocket('ws://localhost:5005');
+    const ws = new WebSocket(getWebSocketUrl());
     wsRef.current = ws;
 
     ws.onopen = () => {

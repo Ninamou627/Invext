@@ -299,18 +299,17 @@ npm run start
 
 En production, configurez les variables d'environnement sur la plateforme d'hébergement au lieu d'utiliser des fichiers `.env` locaux.
 
-## Deploiement du frontend sur Render
+## Deploiement du frontend sur Render en Static Site
 
-Le frontend est une application Next.js. Sur Render, il faut la deployer comme un **Web Service Node**, pas comme un Static Site, sauf si vous transformez explicitement l'application en export statique.
+Le frontend est configure en export statique Next.js avec `output: "export"`. Apres `npm run build`, Next genere le dossier `frontend/out`, que Render peut publier comme Static Site.
 
-Configuration recommandee pour le service frontend:
+Configuration recommandee pour le service frontend sur Render:
 
 ```text
-Service Type: Web Service
+Service Type: Static Site
 Root Directory: frontend
-Runtime: Node
 Build Command: npm ci && npm run build
-Start Command: npm run start
+Publish Directory: out
 ```
 
 Variables d'environnement a ajouter dans Render:
@@ -318,8 +317,9 @@ Variables d'environnement a ajouter dans Render:
 ```env
 NODE_VERSION=20.18.0
 NEXT_PUBLIC_API_URL=https://URL-DU-BACKEND-RENDER/api
+NEXT_PUBLIC_WS_URL=wss://URL-DU-BACKEND-RENDER
 ```
 
-Ne mettez pas de `Publish Directory` pour ce mode. L'erreur `Publish directory dist does not exist` signifie que Render a ete configure comme Static Site avec `dist`, mais Next.js ne genere pas ce dossier avec `next build`.
+L'erreur `Publish directory dist does not exist` signifie que Render cherche `dist`, alors que ce projet genere `out`.
 
-Si vous choisissez vraiment un Static Site Render, il faudrait configurer Next avec un export statique et publier `out`, mais ce mode est moins adapte ici car l'application contient des routes dashboard et une route dynamique d'actif.
+Important: en export statique, les routes dynamiques doivent etre connues au build. La page `/dashboard/assets/[symbol]` genere donc les marches principaux (`BINANCE:BTCUSDT`, `BINANCE:ETHUSDT`, `BINANCE:SOLUSDT`, `AAPL`, `MSFT`, etc.). Les autres marches restent utilisables depuis le dashboard principal via le graphique et le terminal, mais une URL directe `/dashboard/assets/...` inconnue ne sera pas creee automatiquement en mode Static Site.
