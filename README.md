@@ -321,7 +321,7 @@ Health Check Path: /health
 Variables d'environnement a ajouter dans Render:
 
 ```env
-NODE_VERSION=20.18.0
+NODE_VERSION=20.19.0
 NODE_ENV=production
 DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require
 JWT_SECRET=une-valeur-longue-et-secrete
@@ -348,7 +348,7 @@ Publish Directory: out
 Variables d'environnement a ajouter dans Render:
 
 ```env
-NODE_VERSION=20.18.0
+NODE_VERSION=20.19.0
 NEXT_PUBLIC_API_URL=https://URL-DU-BACKEND-RENDER/api
 NEXT_PUBLIC_WS_URL=wss://URL-DU-BACKEND-RENDER
 ```
