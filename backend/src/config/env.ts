@@ -7,6 +7,7 @@ const envSchema = z.object({
   // Server
   PORT: z.string().default('5000'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  FRONTEND_URL: z.string().default('http://localhost:3000'),
 
   // Database
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),

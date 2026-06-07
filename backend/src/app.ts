@@ -14,11 +14,13 @@ import { AppError, ValidationError } from './utils/errors';
 
 const app: Application = express();
 
+const allowedOrigins = env.NODE_ENV === 'production'
+  ? env.FRONTEND_URL.split(',').map((origin) => origin.trim()).filter(Boolean)
+  : ['http://localhost:3000'];
+
 // Middleware
 app.use(cors({
-  origin: env.NODE_ENV === 'production'
-    ? ['https://investx.vercel.app']     // Restrict in production
-    : ['http://localhost:3000'],
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

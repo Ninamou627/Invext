@@ -92,6 +92,7 @@ JWT_REFRESH_SECRET="replace-with-another-long-random-secret"
 FINNHUB_API_KEY=""
 PORT=5005
 NODE_ENV=development
+FRONTEND_URL="http://localhost:3000"
 ```
 
 Notes:
@@ -99,6 +100,7 @@ Notes:
 - `DATABASE_URL` doit pointer vers votre base PostgreSQL.
 - `JWT_SECRET` et `JWT_REFRESH_SECRET` doivent être longs et différents.
 - `FINNHUB_API_KEY` est optionnel en développement. Sans clé, le backend utilise des données simulées ou des fallbacks selon les routes.
+- `FRONTEND_URL` doit contenir l'URL publique du frontend en production.
 - Le backend démarre par défaut sur `http://localhost:5005`.
 
 Frontend, fichier `frontend/.env`:
@@ -298,6 +300,37 @@ npm run start
 ```
 
 En production, configurez les variables d'environnement sur la plateforme d'hébergement au lieu d'utiliser des fichiers `.env` locaux.
+
+## Deploiement du backend sur Render
+
+Le backend doit etre deploye comme **Web Service Node**.
+
+Configuration recommandee:
+
+```text
+Service Type: Web Service
+Environment: Production
+Language: Node
+Branch: main
+Root Directory: backend
+Build Command: npm ci && npx prisma generate && npx prisma migrate deploy && npm run build
+Start Command: npm run start
+Health Check Path: /health
+```
+
+Variables d'environnement a ajouter dans Render:
+
+```env
+NODE_VERSION=20.18.0
+NODE_ENV=production
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require
+JWT_SECRET=une-valeur-longue-et-secrete
+JWT_REFRESH_SECRET=une-autre-valeur-longue-et-secrete
+FINNHUB_API_KEY=votre-cle-finnhub-ou-vide
+FRONTEND_URL=https://URL-DU-FRONTEND-RENDER
+```
+
+Ne renseignez pas `PORT` sur Render: la plateforme fournit automatiquement cette variable au service.
 
 ## Deploiement du frontend sur Render en Static Site
 
