@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                String   @id @default(uuid())
+  email             String   @unique
+  username          String   @unique
+  passwordHash      String
+  avatarUrl         String?
+  cashBalance       Decimal  @default(100000.00) @db.Decimal(15, 2)
+  preferredCurrency String   @default("USD")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  holdings           Holding[]
+  transactions       Transaction[]
+  orders             Order[]
+  alerts             Alert[]
+  portfolioSnapshots PortfolioSnapshot[]
+  refreshTokens      RefreshToken[]
+}
+
+model RefreshToken {
+  id                  String    @id @default(uuid())
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash           String    @unique
+  expiresAt           DateTime
+  revokedAt           DateTime?
+  replacedByTokenHash String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Holding {
+  id          String  @id @default(uuid())
+  userId      String
+  user        User    @relation(fields: [userId], references: [id])
+  ticker      String
+  quantity    Decimal @db.Decimal(15, 6)
+  avgBuyPrice Decimal @db.Decimal(15, 4)
+  currency    String  @default("USD")
+
+  @@unique([userId, ticker])
+}
+
+model Transaction {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  ticker       String
+  type         String // BUY, SELL
+  quantity     Decimal  @db.Decimal(15, 6)
+  pricePerUnit Decimal  @db.Decimal(15, 4)
+  totalAmount  Decimal  @db.Decimal(15, 2)
+  currency     String   @default("USD")
+  executedAt   DateTime @default(now())
+}
+
+model Order {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  ticker         String
+  side           String // BUY, SELL
+  orderType      String // MARKET, LIMIT
+  quantity       Decimal  @db.Decimal(15, 6)
+  limitPrice     Decimal? @db.Decimal(15, 4)
+  status         String   @default("PENDING") // PENDING, FILLED, PARTIAL, CANCELLED
+  filledQuantity Decimal  @default(0) @db.Decimal(15, 6)
+  createdAt      DateTime @default(now())
+}
+
+model Alert {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  ticker      String
+  targetPrice Decimal  @db.Decimal(15, 4)
+  condition   String // ABOVE, BELOW
+  isTriggered Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model PortfolioSnapshot {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  totalValue  Decimal  @db.Decimal(15, 2)
+  cashBalance Decimal  @db.Decimal(15, 2)
+  equityValue Decimal  @db.Decimal(15, 2)
+  snapshotAt  DateTime @default(now())
+}

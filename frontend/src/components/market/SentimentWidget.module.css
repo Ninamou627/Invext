@@ -1,0 +1,115 @@
+.shell {
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.label {
+  padding: 0.3rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  border: 1px solid var(--border-light);
+}
+
+.bullish {
+  color: var(--accent-success);
+  background: rgba(0, 230, 118, 0.08);
+}
+
+.bearish {
+  color: var(--accent-danger);
+  background: rgba(255, 23, 68, 0.08);
+}
+
+.neutral {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.scoreGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.scoreBox {
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  padding: 0.65rem;
+}
+
+.scoreLabel {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  margin-bottom: 0.25rem;
+}
+
+.scoreValue {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+.keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.keyword {
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 0.25rem 0.45rem;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+}
+
+.articles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.article {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.article a {
+  color: inherit;
+}
+
+.article a:hover {
+  color: var(--accent-primary);
+}
+
+.state {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 760px) {
+  .scoreGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
