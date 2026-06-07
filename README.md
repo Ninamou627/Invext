@@ -313,7 +313,7 @@ Environment: Production
 Language: Node
 Branch: main
 Root Directory: backend
-Build Command: npm ci && npx prisma generate && npx prisma migrate deploy && npm run build
+Build Command: npm ci --include=dev && npx prisma generate && npx prisma db push && npm run build
 Start Command: npm run start
 Health Check Path: /health
 ```
@@ -332,6 +332,8 @@ FRONTEND_URL=https://URL-DU-FRONTEND-RENDER
 
 Ne renseignez pas `PORT` sur Render: la plateforme fournit automatiquement cette variable au service.
 
+La commande utilise `npm ci --include=dev` parce que le build TypeScript a besoin des dependances de developpement (`typescript`, `@types/express`, `@types/cors`, etc.), meme si le service tourne ensuite en production.
+
 ## Deploiement du frontend sur Render en Static Site
 
 Le frontend est configure en export statique Next.js avec `output: "export"`. Apres `npm run build`, Next genere le dossier `frontend/out`, que Render peut publier comme Static Site.
@@ -341,7 +343,7 @@ Configuration recommandee pour le service frontend sur Render:
 ```text
 Service Type: Static Site
 Root Directory: frontend
-Build Command: npm ci && npm run build
+Build Command: npm ci --include=dev && npm run build
 Publish Directory: out
 ```
 
